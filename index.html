@@ -1,0 +1,1616 @@
+<title>인용 카탈로그</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* ---------- design tokens ---------- */
+  :root {
+    --paper: #EEF0E8;
+    --surface: #F8F9F3;
+    --surface-2: #E3E7DA;
+    --ink: #1B241F;
+    --muted: #5B665B;
+    --line: #CBD1C1;
+    --accent: #2B6E56;
+    --accent-ink: #F5F8F3;
+    --accent-soft: #DBE9DF;
+    --stamp: #A3442C;
+    --stamp-soft: #F2DBD1;
+    --warn: #8A5A12;
+    --warn-soft: #F1E3C4;
+    --shadow: 0 1px 2px rgba(20,28,24,0.07), 0 6px 18px rgba(20,28,24,0.06);
+    --serif: 'Spectral', Georgia, 'Times New Roman', serif;
+    --sans: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #101512;
+      --surface: #171E19;
+      --surface-2: #202922;
+      --ink: #E7ECE2;
+      --muted: #93A090;
+      --line: #2A332C;
+      --accent: #74C4A0;
+      --accent-ink: #0D1512;
+      --accent-soft: #223229;
+      --stamp: #E08768;
+      --stamp-soft: #392620;
+      --warn: #DFAE5A;
+      --warn-soft: #392C17;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 26px rgba(0,0,0,0.38);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #101512;
+    --surface: #171E19;
+    --surface-2: #202922;
+    --ink: #E7ECE2;
+    --muted: #93A090;
+    --line: #2A332C;
+    --accent: #74C4A0;
+    --accent-ink: #0D1512;
+    --accent-soft: #223229;
+    --stamp: #E08768;
+    --stamp-soft: #392620;
+    --warn: #DFAE5A;
+    --warn-soft: #392C17;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 26px rgba(0,0,0,0.38);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent-soft); }
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 22px;
+  }
+  .wordmark { display: flex; align-items: baseline; gap: 10px; }
+  .wordmark .tab {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--surface);
+    background: var(--stamp);
+    padding: 3px 7px 2px;
+    transform: rotate(-2deg);
+    border-radius: 1px;
+  }
+  .wordmark h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .tagline {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .doc-info { text-align: right; font-size: 0.82rem; color: var(--muted); max-width: 300px; }
+  .doc-info .name { color: var(--ink); font-weight: 500; }
+  .example-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--warn);
+    background: var(--warn-soft);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+  }
+
+  /* ---------- upload zone ---------- */
+  .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .upload-btn {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: var(--accent-ink);
+    background: var(--accent);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .upload-btn:hover { filter: brightness(1.06); }
+  .upload-btn:active { transform: translateY(1px); }
+  .upload-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .export-btn {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink);
+    padding: 9px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .export-btn:hover { background: var(--ink); color: var(--surface); }
+  .export-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .export-btn:disabled { opacity: 0.45; cursor: default; background: transparent; color: var(--ink); }
+  .upload-hint { font-size: 0.78rem; color: var(--muted); }
+  #file-input { display: none; }
+
+  .status-line {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .status-line.working { color: var(--accent); }
+  .status-line.error { color: var(--stamp); }
+
+  /* reanalysis controls, shown when heading not confidently found */
+  .reanalyze {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    background: var(--warn-soft);
+    border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+  }
+  .reanalyze.show { display: flex; }
+  .reanalyze select {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .reanalyze button {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* ---------- stats strip ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 12px 14px;
+  }
+  .stat .num {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    display: block;
+  }
+  .stat .label {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stat.flag .num { color: var(--stamp); }
+
+  /* ---------- toolbar ---------- */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .search-box {
+    flex: 1 1 220px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+  .search-box input {
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    width: 100%;
+    outline: none;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+  .sort-group {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+  .sort-group button {
+    padding: 8px 11px;
+    border: none;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+  }
+  .sort-group button.active { background: var(--accent); color: var(--accent-ink); }
+  .sort-group button + button { border-left: 1px solid var(--line); }
+
+  .view-tabs {
+    display: inline-flex;
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    margin-bottom: 16px;
+  }
+  .view-tabs button {
+    padding: 8px 14px;
+    border: none;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+  }
+  .view-tabs button.active { background: var(--ink); color: var(--surface); }
+  .view-tabs button + button { border-left: 1px solid var(--ink); }
+
+  /* ---------- sentence review (문장별 검토) ---------- */
+  .sentence-review-list { display: flex; flex-direction: column; gap: 10px; }
+  .sentence-review-row {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 13px 16px;
+    box-shadow: var(--shadow);
+  }
+  .sentence-review-row .page-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-right: 8px;
+    vertical-align: 2px;
+  }
+  .sentence-review-row .sentence-text { font-size: 0.9rem; line-height: 1.6; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 11px; }
+  .chip-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 4px 3px 10px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .chip.unmatched { background: var(--stamp-soft); color: var(--stamp); }
+  .chip .chip-x {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 50%;
+  }
+  .chip .chip-x:hover { background: rgba(0,0,0,0.14); }
+  .add-chip-form { display: inline-flex; align-items: center; }
+  .add-chip-form input {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 3px 10px;
+    width: 120px;
+    background: transparent;
+    color: var(--ink);
+  }
+  .add-chip-form input:focus { outline: none; border-color: var(--accent); }
+  .add-chip-form input.bad { border-color: var(--stamp); color: var(--stamp); }
+
+  /* ---------- reference cards ---------- */
+  .ref-list { display: flex; flex-direction: column; gap: 10px; }
+  .ref-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--stamp);
+    border-radius: 2px 4px 4px 2px;
+    box-shadow: var(--shadow);
+  }
+  .ref-card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 13px 13px 0;
+    border-color: transparent var(--paper) transparent transparent;
+  }
+  .ref-card.unused { border-left-color: var(--line); opacity: 0.86; }
+  .ref-card.hidden { display: none; }
+
+  .ref-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 13px 30px 13px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .ref-marker {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--stamp);
+    white-space: nowrap;
+    padding-top: 3px;
+    min-width: 44px;
+  }
+  .ref-text {
+    flex: 1;
+    font-family: var(--serif);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+  .ref-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .count-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--surface-2);
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .chevron {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  .ref-card.open .chevron { transform: rotate(90deg); }
+
+  .sentence-list {
+    display: none;
+    border-top: 1px solid var(--line);
+    padding: 4px 16px 12px 16px;
+  }
+  .ref-card.open .sentence-list { display: block; }
+  .sentence-row {
+    display: flex;
+    gap: 12px;
+    padding: 9px 0 9px 44px;
+    border-top: 1px dashed var(--line);
+  }
+  .sentence-row:first-child { border-top: none; }
+  .page-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 34px;
+  }
+  .sentence-text {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .mark-hit {
+    font-family: var(--mono);
+    font-weight: 600;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0 3px;
+    border-radius: 3px;
+  }
+
+  /* ---------- diagnostics ---------- */
+  .diagnostics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 26px;
+  }
+  @media (max-width: 620px) { .diagnostics { grid-template-columns: 1fr; } }
+  .diag-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--warn);
+    border-radius: 2px 4px 4px 2px;
+    padding: 12px 14px;
+  }
+  .diag-box.empty { opacity: 0.55; }
+  .diag-box h3 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--warn);
+    margin: 0 0 8px;
+  }
+  .diag-item {
+    font-size: 0.82rem;
+    padding: 5px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .diag-item:first-child { border-top: none; }
+  .diag-item .m { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+  .diag-item .ex { color: var(--muted); }
+
+  /* ---------- section labels ---------- */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 4px 0 10px;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="wordmark">
+        <span class="tab">REF</span>
+        <h1>인용 카탈로그</h1>
+      </div>
+      <div class="tagline">Citation Concordance — 참고문헌별 인용문장 대조부</div>
+    </div>
+    <div class="doc-info">
+      <div class="name" id="doc-name">예시: Attention Is All You Need (발췌)<span class="example-badge">예시</span></div>
+      <div id="doc-substat">6개 문장 · 6개 참고문헌</div>
+    </div>
+  </header>
+
+  <div class="upload-row">
+    <button class="upload-btn" id="upload-trigger" type="button">PDF 업로드</button>
+    <input type="file" id="file-input" accept="application/pdf">
+    <button class="export-btn" id="export-trigger" type="button">Markdown으로 내보내기</button>
+    <span class="upload-hint">텍스트 기반 PDF 논문을 올리면 자동으로 분석합니다. 파일은 브라우저에서만 처리되고 어디로도 전송되지 않습니다.</span>
+  </div>
+  <div class="status-line" id="status-line"></div>
+  <div class="status-line" id="export-status"></div>
+
+  <div class="reanalyze" id="reanalyze-box">
+    <span>⚠ 참고문헌 시작 위치를 확신할 수 없어요.</span>
+    <label>시작 페이지:
+      <select id="ref-page-select"></select>
+    </label>
+    <button id="reanalyze-btn" type="button">다시 분석</button>
+  </div>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="view-tabs" role="group" aria-label="보기 방식">
+    <button data-view="byRef" class="active" type="button">참고문헌별 보기</button>
+    <button data-view="bySentence" type="button">문장별 검토</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span aria-hidden="true">🔍</span>
+      <input type="text" id="search-input" placeholder="참고문헌 번호·저자·문장 내용으로 찾기">
+    </div>
+    <div class="sort-group" id="sort-group" role="group" aria-label="정렬 방식">
+      <button data-sort="order" class="active" type="button">목록 순</button>
+      <button data-sort="freq" type="button">인용 빈도 순</button>
+    </div>
+  </div>
+
+  <div class="section-label" id="section-label">참고문헌별 인용 문장</div>
+
+  <div class="ref-list" id="ref-list"></div>
+
+  <div class="sentence-review-list" id="sentence-list" style="display:none;"></div>
+  <datalist id="all-refs-datalist"></datalist>
+
+  <div class="empty-state" id="empty-state" style="display:none;">조건에 맞는 참고문헌이 없어요.</div>
+
+  <div class="diagnostics" id="diagnostics"></div>
+
+  <footer>
+    이 도구는 정규식 기반 휴리스틱으로 문장과 인용 표기를 인식합니다 — 문장 분리, 저자·연도 인식이 완벽하지 않을 수 있으니 결과를 논문 원문과 한 번 대조해보세요.
+    스캔된 이미지 PDF(텍스트 레이어 없음)는 인식되지 않습니다.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  /* ============================================================
+     TEXT UTILITIES
+     ============================================================ */
+  const ABBREVS = ['e.g.','i.e.','etc.','vs.','cf.','Fig.','fig.','Eq.','eq.','No.','no.','pp.','p.','Dr.','Mr.','Mrs.','Ms.','Prof.','approx.','Vol.','vol.'];
+
+  function protectAbbrevs(text) {
+    let t = text.replace(/\b(?:[A-Z]\.){2,}/g, m => m.replace(/\./g, '∙'));
+    t = t.replace(/\bet al\./gi, m => m.replace(/\./g, '∙'));
+    ABBREVS.forEach(ab => {
+      const esc = ab.replace(/\./g, '\\.');
+      t = t.replace(new RegExp('\\b' + esc, 'g'), ab.replace(/\.$/, '∙'));
+    });
+    t = t.replace(/(\d)\.(\d)/g, '$1∙$2');
+    return t;
+  }
+
+  function splitSentences(text) {
+    const protectedText = protectAbbrevs(text);
+    const parts = protectedText.split(/(?<=[.?!])\s+(?=[A-Z0-9"'“(\[])/);
+    return parts.map(s => s.replace(/∙/g, '.').trim()).filter(Boolean);
+  }
+
+  function expandNumberedToken(token) {
+    const nums = [];
+    token.split(',').forEach(p => {
+      p = p.trim();
+      const range = p.match(/^(\d+)\s*[-–—]\s*(\d+)$/);
+      if (range) {
+        const a = +range[1], b = +range[2];
+        for (let i = a; i <= b; i++) nums.push(i);
+      } else if (/^\d+$/.test(p)) {
+        nums.push(+p);
+      }
+    });
+    return nums;
+  }
+
+  function findNumberedCitations(sentence) {
+    const results = [];
+    // bracket style: [1], [2,3], [4-6]
+    const bracketRe = /\[(\d+(?:\s*[-–—,]\s*\d+)*)\]/g;
+    let m;
+    while ((m = bracketRe.exec(sentence))) {
+      results.push({ nums: expandNumberedToken(m[1]), raw: m[0], start: m.index, end: m.index + m[0].length });
+    }
+    // bare-parenthesis style used by many medical journals: (1), ( 3,4), (8-13), (22,23)
+    // a lone 4+ digit number is excluded (almost certainly a year or measurement, not a citation index)
+    const parenRe = /\(\s*(\d{1,3}(?:\s*[-–—,]\s*\d{1,3})*)\s*\)/g;
+    while ((m = parenRe.exec(sentence))) {
+      const token = m[1];
+      const isList = /[-–—,]/.test(token);
+      if (!isList && +token >= 1000) continue;
+      results.push({ nums: expandNumberedToken(token), raw: m[0], start: m.index, end: m.index + m[0].length });
+    }
+    return results;
+  }
+
+  function findAuthorYearCitations(sentence) {
+    const results = [];
+    const parenRe = /\(([^()]{0,220}?\b(?:19|20)\d{2}[a-z]?\b[^()]{0,220})\)/g;
+    let m;
+    while ((m = parenRe.exec(sentence))) {
+      const inner = m[1];
+      const looksLikeCitationList = (/[A-Z][\p{L}\-']+.{0,40}?\b(19|20)\d{2}/u.test(inner) &&
+        /,\s*(19|20)\d{2}/.test(inner)) || /&|\bet al\b|;/.test(inner);
+      const clauses = looksLikeCitationList ? inner.split(';').map(s => s.trim()) : [inner];
+      let anyParsed = false;
+      clauses.forEach(clause => {
+        const authorYear = clause.match(/([A-Z][\p{L}\-']+)(?:\s+et al\.?)?(?:,?\s*(?:&|and)\s*[A-Z][\p{L}\-']*)?,?\s*((?:19|20)\d{2}[a-z]?)/u);
+        if (authorYear) {
+          anyParsed = true;
+          results.push({ author: authorYear[1], year: authorYear[2], raw: m[0], start: m.index, end: m.index + m[0].length });
+        }
+      });
+      if (!anyParsed) {
+        const before = sentence.slice(0, m.index);
+        const authorMatch = before.match(/([A-Z][\p{L}\-']+(?:\s+(?:et al\.?|&|and)\s+[A-Z][\p{L}\-']+)*)\s*$/u);
+        const yearMatch = inner.match(/((?:19|20)\d{2}[a-z]?)/);
+        if (authorMatch && yearMatch) {
+          results.push({
+            author: authorMatch[1].split(/\s+/)[0], year: yearMatch[1],
+            raw: authorMatch[1] + ' ' + m[0], start: m.index - authorMatch[1].length, end: m.index + m[0].length
+          });
+        }
+      }
+    }
+    return results;
+  }
+
+  function buildAuthorYearKey(author, year) {
+    return author.toLowerCase() + '_' + year.replace(/[a-z]$/, '');
+  }
+
+  /* ============================================================
+     REFERENCE LIST PARSING
+     ============================================================ */
+  function parseNumberedReferenceList(text) {
+    const re = /(?:^|\n)\s*(?:\[(\d{1,3})\]|(\d{1,3})[.\)])\s+/g;
+    const matches = [];
+    let m;
+    while ((m = re.exec(text))) matches.push({ num: +(m[1] || m[2]), pos: m.index, end: re.lastIndex });
+    const entries = [];
+    for (let i = 0; i < matches.length; i++) {
+      const start = matches[i].end;
+      const end = i + 1 < matches.length ? matches[i + 1].pos : text.length;
+      const t = text.slice(start, end).replace(/\s+/g, ' ').trim();
+      if (t) entries.push({ num: matches[i].num, text: t });
+    }
+    return entries;
+  }
+
+  function parseAuthorYearReferenceList(text) {
+    const splitRe = /\n(?=[A-Z][\p{L}\-']+,\s)/u;
+    return text.trim().split(splitRe).map(s => s.replace(/\s+/g, ' ').trim()).filter(s => s.length > 8);
+  }
+
+  function refEntryKey(entryText) {
+    const m = entryText.match(/^([A-Z][\p{L}\-']+).{0,60}?\(?((?:19|20)\d{2}[a-z]?)\)?/u);
+    if (!m) return null;
+    return buildAuthorYearKey(m[1], m[2]);
+  }
+
+  function buildDisplayMarker(entryText) {
+    const m = entryText.match(/^([A-Z][\p{L}\-']+)(?:,[^()]*)?\(((?:19|20)\d{2}[a-z]?)\)/u);
+    if (!m) return '—';
+    const hasMore = /,\s*[A-Z]\.[^()]*(?:&|,)/.test(entryText.slice(0, entryText.indexOf('(')));
+    return m[1] + (hasMore ? ' 외' : '') + ' ' + m[2];
+  }
+
+  function detectReferenceStyle(refText) {
+    const numbered = (refText.match(/(?:^|\n)\s*(?:\[\d{1,3}\]|\d{1,3}[.\)])\s+/g) || []).length;
+    const authorYear = (refText.match(/\n(?=[A-Z][\p{L}\-']+,\s)/gu) || []).length;
+    return numbered >= 2 && numbered >= authorYear ? 'numbered' : 'author-year';
+  }
+
+  function parseReferenceList(text, style) {
+    if (style === 'numbered') {
+      return parseNumberedReferenceList(text).map(e => ({
+        key: 'n' + e.num, num: e.num, marker: '[' + e.num + ']', text: e.text, sentences: []
+      }));
+    }
+    return parseAuthorYearReferenceList(text).map((e, i) => {
+      const k = refEntryKey(e);
+      return { key: k || ('u' + i), marker: buildDisplayMarker(e), text: e, sentences: [] };
+    });
+  }
+
+  /* ============================================================
+     PDF -> PAGE TEXT (pdf.js)
+     ============================================================ */
+  // strip everything but letters and uppercase what's left — this is the robust way
+  // to recognize a heading regardless of how its letters got spaced out by the PDF's
+  // typesetting ("R E F E R E N C E S", "I NTRO D U C TI O N", "1 | Introduction" all
+  // reduce to one clean word, immune to where the spaces and section numbers land)
+  function stripToLetters(s) {
+    return s.replace(/[^A-Za-z]/g, '').toUpperCase();
+  }
+
+  function lineMatchesHeading(line, latinWords, koreanRe) {
+    const t = (line || '').trim();
+    if (!t || t.length > 90) return false;
+    const compact = stripToLetters(t);
+    if (compact && latinWords.has(compact)) return true;
+    return !!(koreanRe && koreanRe.test(t));
+  }
+
+  const REF_HEADING_WORDS = new Set(['REFERENCES', 'REFERENCE', 'BIBLIOGRAPHY', 'WORKSCITED', 'REFERENCELIST']);
+  const REF_HEADING_KO_RE = /^(참고\s*문헌|참고자료)\s*[:.]?\s*\d{0,3}$/;
+  const INTRO_HEADING_WORDS = new Set(['INTRODUCTION', 'BACKGROUND']);
+  const INTRO_HEADING_KO_RE = /^서\s*론\s*[:.]?\s*\d{0,3}$/;
+
+  async function extractPages(file) {
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+    const pages = [];
+    for (let p = 1; p <= doc.numPages; p++) {
+      const page = await doc.getPage(p);
+      const content = await page.getTextContent();
+      pages.push({ num: p, items: content.items.map(it => ({
+        str: it.str, hasEOL: !!it.hasEOL,
+        x: it.transform ? it.transform[4] : null,
+        y: it.transform ? it.transform[5] : null,
+        width: it.width || 0, height: it.height || 10
+      })) });
+    }
+    return pages;
+  }
+
+  // decide whether two adjacent same-line text items had real whitespace between them in
+  // the original PDF, or were just split into separate glyph runs (common with kerning/ligatures)
+  // a run of bare digits/commas/dashes rendered smaller and raised above the
+  // preceding text's baseline is a superscript citation marker with no bracket
+  // or parenthesis of its own (common in medical/EAACI-style journals) —
+  // synthesize the brackets so the normal numbered-citation detector finds it
+  function isSuperscriptCitation(it, prevHeight, prevY) {
+    if (!/^\d+(?:[,\-\u2013\u2014]\d+)*$/.test((it.str || '').trim())) return false;
+    if (!it.height || !prevHeight || !(it.height <= prevHeight * 0.85)) return false;
+    if (prevY == null || it.y == null || !(it.y > prevY + 1.2)) return false;
+    return true;
+  }
+
+  function joinItems(items) {
+    let out = '';
+    let prevEndX = null, prevY = null;
+    // separate "was this the last genuine running-prose text" reference, used only
+    // for the superscript check — a page number or letter-spaced heading must never
+    // count as the baseline a nearby digit run gets compared against
+    let proseHeight = null, proseY = null;
+    items.forEach(it => {
+      const sup = isSuperscriptCitation(it, proseHeight, proseY);
+      if (out && !(prevEndX == null)) {
+        const sameLine = prevY != null && it.y != null && Math.abs(it.y - prevY) < 6;
+        const gap = sameLine && it.x != null ? it.x - prevEndX : Infinity;
+        if (!sameLine || gap > (it.height || 10) * 0.18) out += ' ';
+      } else if (out) {
+        out += ' ';
+      }
+      out += sup ? '[' + it.str.trim() + ']' : it.str;
+      prevEndX = it.x != null ? it.x + (it.width || 0) : null;
+      prevY = it.y != null ? it.y : null;
+      const trimmed = (it.str || '').trim();
+      // any letter counts, not just lowercase — "(DPT)" is genuine running prose too,
+      // it just happens to be an all-caps abbreviation; only bare digits (page numbers)
+      // and lone-letter fragments (letter-spaced headings) are excluded here
+      if (!sup && trimmed.length >= 3 && /[A-Za-z]/.test(it.str)) {
+        proseHeight = it.height || proseHeight;
+        proseY = it.y != null ? it.y : proseY;
+      }
+    });
+    return out;
+  }
+
+  function pageLineText(page) {
+    let out = '';
+    let lineItems = [];
+    page.items.forEach(it => {
+      lineItems.push(it);
+      if (it.hasEOL) { out += joinItems(lineItems) + '\n'; lineItems = []; }
+    });
+    if (lineItems.length) out += joinItems(lineItems);
+    return out;
+  }
+
+  // running headers/footers and bare section headings that journals repeat on every page —
+  // stripping these keeps them from gluing onto the start of a real sentence. Matched by
+  // stripToLetters so it doesn't matter whether the PDF spaced the letters out or not.
+  const NOISE_HEADING_WORDS = new Set(['ABSTRACT', 'INTRODUCTION', 'METHODS', 'METHOD',
+    'MATERIALSANDMETHODS', 'RESULTS', 'DISCUSSION', 'CONCLUSION', 'CONCLUSIONS', 'BACKGROUND',
+    'ACKNOWLEDGMENTS', 'ACKNOWLEDGEMENTS', 'FUNDING', 'FOOTNOTE', 'FOOTNOTES', 'ETHICALSTATEMENT',
+    'OPENACCESSSTATEMENT', 'SUPPLEMENTARY', 'REFERENCES', 'BIBLIOGRAPHY', 'CONFLICTOFINTEREST',
+    'ORCID', 'KEYWORDS']);
+
+  function isNoiseLine(line) {
+    const t = (line || '').trim();
+    if (!t) return true;
+    if (/doi\.org/i.test(t)) return true;
+    if (/\bdoi:\s*10\.\d{3,}/i.test(t)) return true;
+    if (/^©/.test(t) || /^copyright\b/i.test(t)) return true;
+    if (/wiley online library/i.test(t) || /wileyonlinelibrary\.com/i.test(t) || /downloaded from https?:\/\//i.test(t)) return true;
+    if (/^received:\s/i.test(t) && /revised:/i.test(t)) return true;
+    const compact = stripToLetters(t);
+    if (compact.length >= 3 && compact.length <= 30 && NOISE_HEADING_WORDS.has(compact)) return true;
+    if (t.length < 40 && /^(참고\s*문헌|참고자료|서\s*론)\s*[:.]?\s*\d{0,3}$/.test(t)) return true;
+    // "Shim et al. Cough counts...4054" — running head glued directly to a page number
+    if (/^[A-Z][\p{L}\-]+\set al\.[^\n]{0,120}?\d{3,6}$/u.test(t)) return true;
+    // a short, mostly-uppercase line is almost always a masthead/running-head label,
+    // e.g. "EAACI POSITION PAPER" — not real prose. The length allowance is generous
+    // because letter-spacing ("E A A C I ...") can double a heading's raw character count.
+    if (t.length < 90 && /[A-Z]{3,}/.test(t) && /^[A-Z0-9 \-|.,]+$/.test(t)) return true;
+    // byline with affiliation-superscript markers: "Name[1] | Name[2] | Name[3] ..."
+    // — looks just like a run of numbered citations, but it's author affiliations
+    if ((t.match(/\[\d{1,3}\]/g) || []).length >= 3 && (t.match(/\|/g) || []).length >= 2) return true;
+    return false;
+  }
+
+  function pageLinesClean(page) {
+    const lines = [];
+    let lineItems = [];
+    page.items.forEach(it => {
+      lineItems.push(it);
+      if (it.hasEOL) { lines.push(joinItems(lineItems)); lineItems = []; }
+    });
+    if (lineItems.length) lines.push(joinItems(lineItems));
+    return lines.filter(l => !isNoiseLine(l));
+  }
+
+  function fixHyphenation(text) {
+    return text.replace(/([a-z])-\n([a-z])/g, '$1$2');
+  }
+
+  // scans every page's raw lines for a heading; `stopAtFirst` favors the earliest
+  // match (for Introduction, which sits near the start), otherwise the latest match
+  // wins (for References, since the word can appear incidentally earlier — e.g. in
+  // the abstract — and the real section heading is always the last occurrence)
+  function findHeadingPage(pages, latinWords, koreanRe, stopAtFirst) {
+    let found = null;
+    for (const pg of pages) {
+      const lines = pageLineText(pg).split('\n');
+      for (const line of lines) {
+        if (lineMatchesHeading(line, latinWords, koreanRe)) {
+          found = pg.num;
+          if (stopAtFirst) return found;
+        }
+      }
+    }
+    return found;
+  }
+
+  function findReferencesPage(pages) {
+    return findHeadingPage(pages, REF_HEADING_WORDS, REF_HEADING_KO_RE, false);
+  }
+
+  function findIntroPage(pages) {
+    return findHeadingPage(pages, INTRO_HEADING_WORDS, INTRO_HEADING_KO_RE, true);
+  }
+
+  function buildBodyText(bodyPages) {
+    let big = '';
+    bodyPages.forEach(pg => {
+      big += 'PAGE:' + pg.num + '';
+      big += pageLinesClean(pg).join('\n') + '\n';
+    });
+    return fixHyphenation(big);
+  }
+
+  function buildRefText(refPages, headingPage) {
+    let text = refPages.map(pg => pageLinesClean(pg).join('\n')).join('\n');
+    text = fixHyphenation(text);
+    const lines = text.split('\n');
+    if (lines.length && lineMatchesHeading(lines[0], REF_HEADING_WORDS, REF_HEADING_KO_RE)) lines.shift();
+    return lines.join('\n').trim();
+  }
+
+  function sentencesWithPages(bodyText) {
+    const raw = splitSentences(bodyText);
+    const out = [];
+    let currentPage = null;
+    raw.forEach(chunk => {
+      const pageMatches = [...chunk.matchAll(/PAGE:(\d+)/g)];
+      if (pageMatches.length) currentPage = +pageMatches[0][1];
+      const clean = chunk.replace(/PAGE:\d+/g, '').replace(/\s+/g, ' ').trim();
+      if (clean.length > 1) out.push({ text: clean, page: currentPage });
+    });
+    return out;
+  }
+
+  /* ============================================================
+     CONCORDANCE BUILDING
+     ------------------------------------------------------------
+     sentenceRecords is the single source of truth: one entry per
+     citation-bearing sentence, each carrying an editable list of
+     "chips" (the reference keys it's attached to). Both the
+     reference-first view and the diagnostics are DERIVED from it —
+     editing a chip anywhere re-derives everything else, so the two
+     views can never drift out of sync with each other.
+     ============================================================ */
+  function buildSentenceRecords(sentences, style) {
+    const records = [];
+    let seq = 0;
+    sentences.forEach(({ text, page }) => {
+      const rawMatches = style === 'numbered' ? findNumberedCitations(text) : findAuthorYearCitations(text);
+      if (!rawMatches.length) return; // "인용 해당없음" sentences are excluded from review entirely
+      const chipMap = new Map(); // key -> chip
+      rawMatches.forEach(c => {
+        if (style === 'numbered') {
+          c.nums.forEach(n => {
+            const key = 'n' + n;
+            if (!chipMap.has(key)) chipMap.set(key, { key, label: String(n), start: c.start, end: c.end, manual: false });
+          });
+        } else {
+          const key = buildAuthorYearKey(c.author, c.year);
+          if (!chipMap.has(key)) chipMap.set(key, { key, label: c.author + ' ' + c.year, start: c.start, end: c.end, manual: false });
+        }
+      });
+      records.push({ id: 's' + (seq++), text, page, chips: [...chipMap.values()] });
+    });
+    return records;
+  }
+
+  // recompute ref.sentences and the unmatched list from the current (possibly
+  // hand-edited) sentenceRecords — call this after every chip add/remove
+  function deriveFromSentenceRecords(sentenceRecords, refs) {
+    const refByKey = new Map(refs.map(r => [r.key, r]));
+    refs.forEach(r => { r.sentences = []; });
+    const unmatched = new Map(); // key -> {marker, count, examples:[{text,page}]}
+
+    sentenceRecords.forEach(rec => {
+      rec.chips.forEach(chip => {
+        const ref = refByKey.get(chip.key);
+        if (ref) {
+          ref.sentences.push({ text: rec.text, page: rec.page, hlStart: chip.start, hlEnd: chip.end });
+        } else {
+          if (!unmatched.has(chip.key)) unmatched.set(chip.key, { marker: chip.label, count: 0, examples: [] });
+          const u = unmatched.get(chip.key);
+          u.count++;
+          if (u.examples.length < 2) u.examples.push({ text: rec.text, page: rec.page });
+        }
+      });
+    });
+
+    return { unmatched: [...unmatched.values()].sort((a, b) => b.count - a.count) };
+  }
+
+  // ref lookup used by the "add a citation" control in the sentence review tab —
+  // matches on the normalized display marker so typing "11" or "[11]" or
+  // "Vaswani 2017" all resolve the same way regardless of style
+  function normalizeMarkerText(s) {
+    return String(s).replace(/[\[\]]/g, '').trim().toLowerCase();
+  }
+
+  function buildRefLookup(refs) {
+    const map = new Map();
+    refs.forEach(r => map.set(normalizeMarkerText(r.marker), r));
+    return map;
+  }
+
+  /* ============================================================
+     STATE + RENDER
+     ============================================================ */
+  const state = {
+    docName: '예시: Attention Is All You Need (발췌)',
+    isExample: true,
+    refs: [],
+    sentenceRecords: [],
+    unmatched: [],
+    sortMode: 'order',
+    query: '',
+    openKeys: new Set(),
+    viewMode: 'byRef' // 'byRef' | 'bySentence'
+  };
+
+  function rebuildFromEdits() {
+    const { unmatched } = deriveFromSentenceRecords(state.sentenceRecords, state.refs);
+    state.unmatched = unmatched;
+    render();
+  }
+
+  function el(tag, props, children) {
+    const node = document.createElement(tag);
+    if (props) Object.keys(props).forEach(k => {
+      if (k === 'class') node.className = props[k];
+      else if (k === 'text') node.textContent = props[k];
+      else if (k.startsWith('on')) node.addEventListener(k.slice(2), props[k]);
+      else node.setAttribute(k, props[k]);
+    });
+    (children || []).forEach(c => { if (c) node.appendChild(c); });
+    return node;
+  }
+
+  function highlightedSentenceNode(text, hlStart, hlEnd) {
+    const wrap = document.createElement('span');
+    wrap.className = 'sentence-text';
+    if (hlStart == null || hlEnd == null || hlStart < 0 || hlEnd > text.length) {
+      wrap.textContent = text;
+      return wrap;
+    }
+    wrap.appendChild(document.createTextNode(text.slice(0, hlStart)));
+    const mark = document.createElement('span');
+    mark.className = 'mark-hit';
+    mark.textContent = text.slice(hlStart, hlEnd);
+    wrap.appendChild(mark);
+    wrap.appendChild(document.createTextNode(text.slice(hlEnd)));
+    return wrap;
+  }
+
+  /* ============================================================
+     MARKDOWN EXPORT (archive the reviewed result as a .md file)
+     ============================================================ */
+  function mdInline(s) {
+    return String(s).replace(/([*_`])/g, '\\$1').replace(/\r?\n/g, ' ');
+  }
+
+  function sentenceToMarkdown(text, hlStart, hlEnd) {
+    if (hlStart == null || hlEnd == null || hlStart < 0 || hlEnd > text.length) return mdInline(text);
+    return mdInline(text.slice(0, hlStart)) + '**' + mdInline(text.slice(hlStart, hlEnd)) + '**' + mdInline(text.slice(hlEnd));
+  }
+
+  function buildMarkdown() {
+    const totalSentences = state.refs.reduce((a, r) => a + r.sentences.length, 0);
+    const unusedRefs = state.refs.filter(r => r.sentences.length === 0);
+    const unmatchedCount = state.unmatched.reduce((a, u) => a + u.count, 0);
+    const today = new Date().toISOString().slice(0, 10);
+
+    const lines = [];
+    lines.push('# 인용 카탈로그 — ' + mdInline(state.docName));
+    lines.push('');
+    lines.push('_생성일: ' + today + (state.isExample ? ' · 예시 데이터' : '') + '_');
+    lines.push('');
+    lines.push('| 항목 | 값 |');
+    lines.push('|---|---|');
+    lines.push('| 참고문헌 총 | ' + state.refs.length + ' |');
+    lines.push('| 본문 인용 문장 | ' + totalSentences + ' |');
+    lines.push('| 인용 안 된 참고문헌 | ' + unusedRefs.length + ' |');
+    lines.push('| 매칭 안 된 인용 | ' + unmatchedCount + ' |');
+    lines.push('');
+    lines.push('## 참고문헌별 인용 문장');
+    lines.push('');
+    state.refs.forEach(ref => {
+      lines.push('### ' + mdInline(ref.marker) + ' — ' + mdInline(ref.text));
+      lines.push('');
+      if (ref.sentences.length === 0) {
+        lines.push('_본문에서 이 참고문헌을 인용한 문장을 찾지 못했어요._');
+      } else {
+        ref.sentences.forEach(s => {
+          const pageTag = s.page ? '`p.' + s.page + '` ' : '';
+          lines.push('- ' + pageTag + sentenceToMarkdown(s.text, s.hlStart, s.hlEnd));
+        });
+      }
+      lines.push('');
+    });
+    lines.push('## 진단');
+    lines.push('');
+    lines.push('### 본문에는 있지만 목록에서 못 찾은 인용');
+    if (state.unmatched.length === 0) {
+      lines.push('없음 — 모든 인용이 참고문헌과 매칭됐어요.');
+    } else {
+      state.unmatched.forEach(u => {
+        const ex = u.examples[0] ? mdInline(u.examples[0].text) : '';
+        lines.push('- `' + mdInline(u.marker) + '` · ' + u.count + '회 · 예: “' + ex + '”');
+      });
+    }
+    lines.push('');
+    lines.push('### 목록에는 있지만 본문에서 안 쓰인 참고문헌');
+    if (unusedRefs.length === 0) {
+      lines.push('없음 — 모든 참고문헌이 인용됐어요.');
+    } else {
+      unusedRefs.forEach(r => lines.push('- ' + mdInline(r.marker) + ' · ' + mdInline(r.text)));
+    }
+    lines.push('');
+    lines.push('---');
+    lines.push('_정규식 기반 휴리스틱으로 자동 인식한 결과입니다. 저장 전 원문과 한 번 대조해 확인하세요._');
+    return lines.join('\n');
+  }
+
+  function suggestedFilename() {
+    let base = state.isExample ? '예시-Attention-Is-All-You-Need' : String(state.docName || '인용카탈로그').replace(/\.pdf$/i, '');
+    base = base.replace(/[\\/:*?"<>|]/g, '').trim() || '인용카탈로그';
+    return base + '-인용카탈로그.md';
+  }
+
+  function setExportStatus(msg, cls) {
+    const el2 = document.getElementById('export-status');
+    el2.textContent = msg || '';
+    el2.className = 'status-line' + (cls ? ' ' + cls : '');
+  }
+
+  async function exportMarkdown() {
+    const btn = document.getElementById('export-trigger');
+    const md = buildMarkdown();
+    const filename = suggestedFilename();
+
+    if (typeof window.claude === 'undefined' || typeof window.claude.use !== 'function') {
+      setExportStatus('이 화면에서는 파일 저장을 사용할 수 없어요. Claude 아티팩트 페이지에서 열어 다시 시도해주세요.', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    setExportStatus('저장 창을 여는 중…', 'working');
+    try {
+      const downloads = await window.claude.use('downloads');
+      if (!downloads) {
+        setExportStatus('이 화면에서는 파일 저장 기능을 사용할 수 없어요.', 'error');
+        return;
+      }
+      const result = await downloads.save({ filename, data: md });
+      setExportStatus(result.status === 'saved' ? '저장했어요: ' + filename : '내보냈어요: ' + filename, '');
+    } catch (e) {
+      const code = e && e.code;
+      const MESSAGES = {
+        declined: '저장을 취소했어요.',
+        rate_limited: '저장 창이 이미 열려 있어요. 잠시 후 다시 시도해주세요.',
+        rejected_extension: '이 형식은 저장할 수 없어요.',
+        extension_not_enabled: '이 화면에서는 .md 저장이 꺼져 있어요.',
+        unavailable: '이 화면에서는 파일 저장을 사용할 수 없어요.',
+        not_granted: '파일 저장 권한이 없어요.',
+        capability_disabled: '파일 저장 기능이 꺼져 있어요.',
+        capability_removed: '파일 저장 기능을 사용할 수 없어요.'
+      };
+      setExportStatus(MESSAGES[code] || ('저장하지 못했어요: ' + (e && e.message ? e.message : '알 수 없는 오류')), 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function render() {
+    renderStats();
+    renderDatalist();
+    const isByRef = state.viewMode === 'byRef';
+    document.getElementById('section-label').textContent =
+      isByRef ? '참고문헌별 인용 문장' : '문장별 인용 검토 — 잘못 매칭된 번호는 여기서 고칠 수 있어요';
+    document.getElementById('ref-list').style.display = isByRef ? '' : 'none';
+    document.getElementById('sentence-list').style.display = isByRef ? 'none' : '';
+    document.getElementById('sort-group').style.display = isByRef ? '' : 'none';
+    if (isByRef) renderRefList(); else renderSentenceList();
+    renderDiagnostics();
+  }
+
+  function renderDatalist() {
+    const dl = document.getElementById('all-refs-datalist');
+    dl.innerHTML = '';
+    state.refs.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.marker.replace(/[[\]]/g, '');
+      dl.appendChild(opt);
+    });
+  }
+
+  function renderStats() {
+    const stats = document.getElementById('stats');
+    stats.innerHTML = '';
+    const totalSentences = state.refs.reduce((acc, r) => acc + r.sentences.length, 0);
+    const cited = state.refs.filter(r => r.sentences.length > 0).length;
+    const unusedCount = state.refs.length - cited;
+    const unmatchedCount = state.unmatched.reduce((a, u) => a + u.count, 0);
+
+    const items = [
+      ['참고문헌 총', state.refs.length, false],
+      ['본문 인용 문장', totalSentences, false],
+      ['인용 안 된 참고문헌', unusedCount, unusedCount > 0],
+      ['매칭 안 된 인용', unmatchedCount, unmatchedCount > 0]
+    ];
+    items.forEach(([label, num, flag]) => {
+      stats.appendChild(el('div', { class: 'stat' + (flag ? ' flag' : '') }, [
+        el('span', { class: 'num', text: String(num) }),
+        el('span', { class: 'label', text: label })
+      ]));
+    });
+
+    document.getElementById('doc-name').innerHTML = '';
+    const nameNode = document.getElementById('doc-name');
+    nameNode.appendChild(document.createTextNode(state.docName));
+    if (state.isExample) {
+      const badge = document.createElement('span');
+      badge.className = 'example-badge';
+      badge.textContent = '예시';
+      nameNode.appendChild(badge);
+    }
+    document.getElementById('doc-substat').textContent =
+      totalSentences + '개 문장 · ' + state.refs.length + '개 참고문헌';
+  }
+
+  function matchesQuery(ref, q) {
+    if (!q) return true;
+    const hay = (ref.marker + ' ' + ref.text + ' ' + ref.sentences.map(s => s.text).join(' ')).toLowerCase();
+    return hay.includes(q.toLowerCase());
+  }
+
+  function renderRefList() {
+    const list = document.getElementById('ref-list');
+    list.innerHTML = '';
+    let refs = state.refs.slice();
+    if (state.sortMode === 'freq') {
+      refs.sort((a, b) => b.sentences.length - a.sentences.length);
+    }
+    const filtered = refs.filter(r => matchesQuery(r, state.query));
+
+    const emptyEl = document.getElementById('empty-state');
+    emptyEl.textContent = '조건에 맞는 참고문헌이 없어요.';
+    emptyEl.style.display = filtered.length ? 'none' : 'block';
+
+    filtered.forEach(ref => {
+      const isOpen = state.openKeys.has(ref.key);
+      const card = el('div', { class: 'ref-card' + (isOpen ? ' open' : '') + (ref.sentences.length === 0 ? ' unused' : '') });
+
+      const head = el('div', { class: 'ref-head', onclick: () => {
+        if (state.openKeys.has(ref.key)) state.openKeys.delete(ref.key); else state.openKeys.add(ref.key);
+        render();
+      }}, [
+        el('span', { class: 'ref-marker', text: ref.marker }),
+        el('span', { class: 'ref-text', text: ref.text }),
+        el('span', { class: 'ref-meta' }, [
+          el('span', { class: 'count-badge', text: ref.sentences.length + '문장' }),
+          el('span', { class: 'chevron', text: '▸' })
+        ])
+      ]);
+      card.appendChild(head);
+
+      const sList = el('div', { class: 'sentence-list' });
+      if (ref.sentences.length === 0) {
+        sList.appendChild(el('div', { class: 'sentence-row' }, [
+          el('span', { class: 'page-tag', text: '' }),
+          el('span', { class: 'sentence-text', text: '본문에서 이 참고문헌을 인용한 문장을 찾지 못했어요.' })
+        ]));
+      } else {
+        ref.sentences.forEach(s => {
+          const row = el('div', { class: 'sentence-row' }, [
+            el('span', { class: 'page-tag', text: s.page ? 'p.' + s.page : '' })
+          ]);
+          row.appendChild(highlightedSentenceNode(s.text, s.hlStart, s.hlEnd));
+          sList.appendChild(row);
+        });
+      }
+      card.appendChild(sList);
+      list.appendChild(card);
+    });
+  }
+
+  function renderDiagnostics() {
+    const box = document.getElementById('diagnostics');
+    box.innerHTML = '';
+
+    const unusedRefs = state.refs.filter(r => r.sentences.length === 0);
+    const box1 = el('div', { class: 'diag-box' + (state.unmatched.length ? '' : ' empty') }, [
+      el('h3', { text: '본문에는 있지만 목록에서 못 찾은 인용' })
+    ]);
+    if (state.unmatched.length === 0) {
+      box1.appendChild(el('div', { class: 'diag-item', text: '없음 — 모든 인용이 참고문헌과 매칭됐어요.' }));
+    } else {
+      state.unmatched.forEach(u => {
+        box1.appendChild(el('div', { class: 'diag-item' }, [
+          el('span', { class: 'm', text: u.marker + ' ' }),
+          el('span', { class: 'ex', text: '· ' + u.count + '회 · 예: “' + (u.examples[0] ? u.examples[0].text.slice(0, 46) : '') + '…”' })
+        ]));
+      });
+    }
+
+    const box2 = el('div', { class: 'diag-box' + (unusedRefs.length ? '' : ' empty') }, [
+      el('h3', { text: '목록에는 있지만 본문에서 안 쓰인 참고문헌' })
+    ]);
+    if (unusedRefs.length === 0) {
+      box2.appendChild(el('div', { class: 'diag-item', text: '없음 — 모든 참고문헌이 인용됐어요.' }));
+    } else {
+      unusedRefs.forEach(r => {
+        box2.appendChild(el('div', { class: 'diag-item' }, [
+          el('span', { class: 'm', text: r.marker + ' ' }),
+          el('span', { class: 'ex', text: '· ' + r.text.slice(0, 50) + '…' })
+        ]));
+      });
+    }
+
+    box.appendChild(box1);
+    box.appendChild(box2);
+  }
+
+  /* ============================================================
+     SENTENCE REVIEW (문장별 검토) — the human-verification view.
+     Reads and writes state.sentenceRecords[i].chips directly;
+     every edit calls rebuildFromEdits() to re-derive the by-ref
+     view, the diagnostics, and (later) the markdown export.
+     ============================================================ */
+  function multiHighlightSentenceNode(text, chips) {
+    const spans = chips
+      .filter(c => c.start != null && c.end != null)
+      .map(c => [c.start, c.end])
+      .sort((a, b) => a[0] - b[0]);
+    const merged = [];
+    spans.forEach(([s, e]) => {
+      const last = merged[merged.length - 1];
+      if (last && s <= last[1]) last[1] = Math.max(last[1], e);
+      else merged.push([s, e]);
+    });
+    const wrap = document.createElement('span');
+    wrap.className = 'sentence-text';
+    if (!merged.length) { wrap.textContent = text; return wrap; }
+    let cursor = 0;
+    merged.forEach(([s, e]) => {
+      if (s > cursor) wrap.appendChild(document.createTextNode(text.slice(cursor, s)));
+      const mark = document.createElement('span');
+      mark.className = 'mark-hit';
+      mark.textContent = text.slice(s, e);
+      wrap.appendChild(mark);
+      cursor = e;
+    });
+    if (cursor < text.length) wrap.appendChild(document.createTextNode(text.slice(cursor)));
+    return wrap;
+  }
+
+  function matchesSentenceQuery(rec, q) {
+    if (!q) return true;
+    const hay = (rec.text + ' ' + rec.chips.map(c => c.label).join(' ')).toLowerCase();
+    return hay.includes(q.toLowerCase());
+  }
+
+  function renderSentenceList() {
+    const list = document.getElementById('sentence-list');
+    list.innerHTML = '';
+    const filtered = state.sentenceRecords.filter(rec => matchesSentenceQuery(rec, state.query));
+    const emptyEl = document.getElementById('empty-state');
+    emptyEl.textContent = '조건에 맞는 문장이 없어요.';
+    emptyEl.style.display = filtered.length ? 'none' : 'block';
+
+    const refByKey = new Map(state.refs.map(r => [r.key, r]));
+    const refLookup = buildRefLookup(state.refs);
+
+    filtered.forEach(rec => {
+      const row = el('div', { class: 'sentence-review-row' });
+      const textLine = document.createElement('div');
+      const pageTag = document.createElement('span');
+      pageTag.className = 'page-tag';
+      pageTag.textContent = rec.page ? 'p.' + rec.page : '';
+      textLine.appendChild(pageTag);
+      textLine.appendChild(multiHighlightSentenceNode(rec.text, rec.chips));
+      row.appendChild(textLine);
+
+      const chipRow = el('div', { class: 'chip-row' }, [
+        el('span', { class: 'chip-label', text: '인용' })
+      ]);
+
+      const sortedChips = rec.chips.slice().sort((a, b) => {
+        const na = parseInt(a.label, 10), nb = parseInt(b.label, 10);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.label.localeCompare(b.label);
+      });
+
+      sortedChips.forEach(chip => {
+        const matched = refByKey.has(chip.key);
+        const removeBtn = el('button', { class: 'chip-x', type: 'button', title: '이 인용 제거', onclick: () => {
+          rec.chips = rec.chips.filter(c => c.key !== chip.key);
+          rebuildFromEdits();
+        }});
+        removeBtn.textContent = '×';
+        chipRow.appendChild(el('span', { class: 'chip' + (matched ? '' : ' unmatched'), title: matched ? '' : '해당 번호의 참고문헌을 찾지 못했어요' }, [
+          el('span', { text: chip.label }),
+          removeBtn
+        ]));
+      });
+
+      const addInput = document.createElement('input');
+      addInput.type = 'text';
+      addInput.setAttribute('list', 'all-refs-datalist');
+      addInput.placeholder = '+ 번호 추가';
+      addInput.title = '번호를 입력하고 Enter를 누르면 추가돼요';
+      addInput.addEventListener('input', () => addInput.classList.remove('bad'));
+      addInput.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const raw = addInput.value.trim();
+        if (!raw) return;
+        const ref = refLookup.get(normalizeMarkerText(raw));
+        if (!ref) { addInput.classList.add('bad'); return; }
+        if (!rec.chips.some(c => c.key === ref.key)) {
+          rec.chips.push({ key: ref.key, label: ref.marker.replace(/[[\]]/g, ''), start: null, end: null, manual: true });
+        }
+        rebuildFromEdits();
+      });
+      const addForm = el('span', { class: 'add-chip-form' });
+      addForm.appendChild(addInput);
+      chipRow.appendChild(addForm);
+
+      row.appendChild(chipRow);
+      list.appendChild(row);
+    });
+  }
+
+  /* ============================================================
+     PIPELINE
+     ============================================================ */
+  let lastPages = null;
+
+  // numbered (Vancouver-style) references are numbered by order of first appearance,
+  // so the very first citation the body ever cites is always "1" — anything flagged
+  // as a citation before that point (a stray affiliation marker, a running head) is
+  // almost certainly noise, not a real reference. Second line of defense after
+  // scoping to Introduction below; a no-op safety net if that scoping already worked.
+  function trimBeforeFirstCitationOne(sentences) {
+    const idx = sentences.findIndex(s => findNumberedCitations(s.text).some(c => c.nums.includes(1)));
+    return idx > 0 ? sentences.slice(idx) : sentences;
+  }
+
+  function runPipeline(pages, forcedHeadingPage) {
+    const headingPage = forcedHeadingPage || findReferencesPage(pages);
+    const introPage = findIntroPage(pages);
+    const reanalyzeBox = document.getElementById('reanalyze-box');
+    const select = document.getElementById('ref-page-select');
+
+    if (!select.options.length) {
+      pages.forEach(pg => {
+        const opt = document.createElement('option');
+        opt.value = pg.num;
+        opt.textContent = pg.num + '페이지';
+        select.appendChild(opt);
+      });
+    }
+    const effectiveHeadingPage = headingPage || pages[pages.length - 1].num;
+    select.value = String(effectiveHeadingPage);
+    reanalyzeBox.classList.toggle('show', !headingPage);
+
+    // title / author / affiliation / abstract come before Introduction and never
+    // contain real citations — excluding them outright avoids having to tell a
+    // citation superscript apart from an author's affiliation-number superscript
+    const bodyPages = pages.filter(p => p.num < effectiveHeadingPage && (!introPage || p.num >= introPage));
+    const refPages = pages.filter(p => p.num >= effectiveHeadingPage);
+
+    const bodyText = buildBodyText(bodyPages);
+    const refText = buildRefText(refPages, effectiveHeadingPage);
+    const style = detectReferenceStyle(refText);
+    const refs = parseReferenceList(refText, style);
+    let sentences = sentencesWithPages(bodyText);
+    if (style === 'numbered') sentences = trimBeforeFirstCitationOne(sentences);
+    const sentenceRecords = buildSentenceRecords(sentences, style);
+    const { unmatched } = deriveFromSentenceRecords(sentenceRecords, refs);
+
+    state.refs = refs;
+    state.sentenceRecords = sentenceRecords;
+    state.unmatched = unmatched;
+    state.openKeys = new Set();
+    render();
+  }
+
+  function setStatus(msg, cls) {
+    const s = document.getElementById('status-line');
+    s.textContent = msg || '';
+    s.className = 'status-line' + (cls ? ' ' + cls : '');
+  }
+
+  async function handleFile(file) {
+    setStatus('“' + file.name + '” 읽는 중…', 'working');
+    document.getElementById('reanalyze-box').classList.remove('show');
+    document.getElementById('ref-page-select').innerHTML = '';
+    try {
+      const pages = await extractPages(file);
+      const totalChars = pages.reduce((a, p) => a + p.items.reduce((b, it) => b + it.str.length, 0), 0);
+      if (totalChars < 40) {
+        setStatus('텍스트를 거의 인식하지 못했어요. 스캔된 이미지 PDF는 지원하지 않아요.', 'error');
+        return;
+      }
+      lastPages = pages;
+      state.docName = file.name;
+      state.isExample = false;
+      runPipeline(pages);
+      setStatus(pages.length + '페이지 분석 완료.', '');
+    } catch (e) {
+      console.error(e);
+      setStatus('PDF를 읽는 중 문제가 발생했어요: ' + e.message, 'error');
+    }
+  }
+
+  /* ============================================================
+     BUILT-IN EXAMPLE (shown at rest, before any upload)
+     ============================================================ */
+  function loadExample() {
+    const style = 'numbered';
+    const refText =
+      '[1] Vaswani, A., Shazeer, N., Parmar, N., et al. Attention Is All You Need. NeurIPS, 2017.\n' +
+      '[2] Devlin, J., Chang, M., Lee, K., Toutanova, K. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL, 2019.\n' +
+      '[3] Radford, A., Narasimhan, K., Salimans, T., Sutskever, I. Improving Language Understanding by Generative Pre-Training. OpenAI, 2018.\n' +
+      '[4] Brown, T., Mann, B., Ryder, N., et al. Language Models are Few-Shot Learners. NeurIPS, 2020.\n' +
+      '[5] Kaplan, J., McCandlish, S., Henighan, T., et al. Scaling Laws for Neural Language Models. arXiv, 2020.\n' +
+      '[6] Liu, Y., Ott, M., Goyal, N., et al. RoBERTa: A Robustly Optimized BERT Pretraining Approach. arXiv, 2019.';
+    const refs = parseReferenceList(refText, style);
+
+    const bodySentences = [
+      { text: 'Transformer architectures have become the dominant paradigm for sequence modeling [1].', page: 1 },
+      { text: 'Extending the original design, several works replaced recurrence entirely with self-attention [1, 2].', page: 1 },
+      { text: 'Pretraining on large unlabeled corpora before fine-tuning has since become standard practice [3].', page: 2 },
+      { text: 'This approach was shown to transfer well across a wide range of downstream tasks [3, 4].', page: 2 },
+      { text: 'More recent efforts scale both model size and training data simultaneously [5].', page: 3 },
+      { text: 'A related benchmark suite has also been proposed for evaluation purposes [8].', page: 3 }
+    ];
+
+    const sentenceRecords = buildSentenceRecords(bodySentences, style);
+    const { unmatched } = deriveFromSentenceRecords(sentenceRecords, refs);
+    state.refs = refs;
+    state.sentenceRecords = sentenceRecords;
+    state.unmatched = unmatched;
+    state.docName = '예시: Attention Is All You Need (발췌)';
+    state.isExample = true;
+    render();
+  }
+
+  /* ============================================================
+     WIRING
+     ============================================================ */
+  document.getElementById('upload-trigger').addEventListener('click', () => {
+    document.getElementById('file-input').click();
+  });
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (f) handleFile(f);
+  });
+  document.getElementById('export-trigger').addEventListener('click', exportMarkdown);
+  document.getElementById('reanalyze-btn').addEventListener('click', () => {
+    if (!lastPages) return;
+    const chosen = +document.getElementById('ref-page-select').value;
+    runPipeline(lastPages, chosen);
+  });
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    state.query = e.target.value;
+    if (state.viewMode === 'byRef') renderRefList(); else renderSentenceList();
+  });
+  document.querySelectorAll('.sort-group button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-group button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.sortMode = btn.dataset.sort;
+      renderRefList();
+    });
+  });
+  document.querySelectorAll('.view-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.viewMode = btn.dataset.view;
+      render();
+    });
+  });
+
+  loadExample();
+})();
+</script>
