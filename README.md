@@ -4,6 +4,7 @@
 
 - 배포판 (Claude Artifact): https://claude.ai/code/artifact/ceca1b51-2419-4dbb-87af-398f3be6dcbb
 - 로컬 실행: `index.html`을 브라우저로 그냥 열면 됩니다 (별도 서버·빌드 과정 없음).
+- 무엇이 바뀌었는지는 [CHANGELOG.md](CHANGELOG.md)에 정리되어 있습니다.
 
 ## 주요 기능
 
