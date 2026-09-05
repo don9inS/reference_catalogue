@@ -632,9 +632,21 @@
     return t;
   }
 
+  // a trailing citation bracket right after the terminal punctuation — with or
+  // without a space before it ("...asthma.[1]" and "...mortality. [5,6]" both
+  // occur) — must not itself count as a sentence boundary; the boundary is
+  // AFTER the bracket. The negative lookahead on the first alternative stops it
+  // from also firing right before the bracket, which would otherwise split the
+  // citation out into its own standalone chunk.
+  const TRAILING_CITATION_RE_SRC = '\\[\\d+(?:\\s*[-–—,]\\s*\\d+)*\\]';
+  const SENTENCE_SPLIT_RE = new RegExp(
+    '(?<=[.?!](?!\\s*' + TRAILING_CITATION_RE_SRC + ')|[.?!]\\s*' + TRAILING_CITATION_RE_SRC + ')' +
+    '\\s+(?=[A-Z0-9"\'“(\\[\x01])'
+  );
+
   function splitSentences(text) {
     const protectedText = protectAbbrevs(text);
-    const parts = protectedText.split(/(?<=[.?!])\s+(?=[A-Z0-9"'“(\[])/);
+    const parts = protectedText.split(SENTENCE_SPLIT_RE);
     return parts.map(s => s.replace(/∙/g, '.').trim()).filter(Boolean);
   }
 
@@ -927,6 +939,18 @@
     return text.replace(/([a-z])-\n([a-z])/g, '$1$2');
   }
 
+  // some access platforms (ClinicalKey, for one) stamp this exact boilerplate
+  // paragraph into the page text itself rather than on its own isolated line, so
+  // it can end up glued mid-sentence or onto the tail of the last reference — a
+  // whole-line noise filter can't reach it. Strip the fixed phrases wherever they
+  // appear, tolerating whatever name/institution/date sits in between.
+  function stripKnownWatermarks(text) {
+    return text.replace(
+      /Downloaded for [^.]*?\bClinicalKey\.com\b[^.]*?\.\s*For personal use only\.\s*No other uses without permission\.\s*Copyright\s*©?\s*\d{4}\.?[^.]*?\.\s*All rights reserved\.?/gi,
+      ' '
+    );
+  }
+
   // scans every page's raw lines for a heading; `stopAtFirst` favors the earliest
   // match (for Introduction, which sits near the start), otherwise the latest match
   // wins (for References, since the word can appear incidentally earlier — e.g. in
@@ -959,7 +983,7 @@
       big += 'PAGE:' + pg.num + '';
       big += pageLinesClean(pg).join('\n') + '\n';
     });
-    return fixHyphenation(big);
+    return stripKnownWatermarks(fixHyphenation(big));
   }
 
   const TRAILING_SECTION_WORDS = new Set(['APPENDIX', 'APPENDICES', 'SUPPLEMENTARYMATERIAL',
@@ -967,16 +991,20 @@
 
   function buildRefText(refPages) {
     let text = refPages.map(pg => pageLinesClean(pg).join('\n')).join('\n');
-    text = fixHyphenation(text);
+    text = stripKnownWatermarks(fixHyphenation(text));
     const lines = text.split('\n');
     if (lines.length && lineMatchesHeading(lines[0], REF_HEADING_WORDS, REF_HEADING_KO_RE)) lines.shift();
-    // an appendix (e.g. a multi-center trial's investigator-by-country list) coming
-    // right after the reference list would otherwise get swallowed into the last
-    // reference's text — cut it off there. This works at line, not page, granularity
-    // because the appendix marker often shares a page with the final reference entries.
+    // an appendix (e.g. a multi-center trial's investigator-by-country list) or a
+    // supplementary table ("TABLE E1. Baseline demographics...") coming right after
+    // the reference list would otherwise get swallowed into the last reference's
+    // text — cut it off there. This works at line, not page, granularity because
+    // that marker often shares a page with the final reference entries.
+    const TABLE_CAPTION_RE = /^table\s*[a-z]?\d+\b/i;
     const cutIdx = lines.findIndex(l => {
-      const compact = stripToLetters(l.trim());
-      return compact.length >= 5 && compact.length <= 30 && TRAILING_SECTION_WORDS.has(compact);
+      const trimmedLine = l.trim();
+      const compact = stripToLetters(trimmedLine);
+      if (compact.length >= 5 && compact.length <= 30 && TRAILING_SECTION_WORDS.has(compact)) return true;
+      return TABLE_CAPTION_RE.test(trimmedLine);
     });
     const trimmed = cutIdx === -1 ? lines : lines.slice(0, cutIdx);
     return trimmed.join('\n').trim();
