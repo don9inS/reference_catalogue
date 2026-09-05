@@ -745,7 +745,26 @@
     return m[1] + (hasMore ? ' 외' : '') + ' ' + m[2];
   }
 
+  // three or more references numbered in a row (1., 2., 3., ...) cannot happen by
+  // accident — it's conclusive proof of a numbered list, regardless of how many
+  // "Lastname, Firstname"-shaped lines also turn up elsewhere (a multi-center
+  // trial's investigator-list appendix can produce hundreds of those and swamp
+  // the count-based heuristic below)
+  function hasAscendingNumberedRun(refText, minRun) {
+    const re = /(?:^|\n)\s*(?:\[(\d{1,3})\]|(\d{1,3})[.\)])\s+/g;
+    const nums = [];
+    let m;
+    while ((m = re.exec(refText))) nums.push(+(m[1] || m[2]));
+    let run = 1;
+    for (let i = 1; i < nums.length; i++) {
+      run = nums[i] === nums[i - 1] + 1 ? run + 1 : 1;
+      if (run >= minRun) return true;
+    }
+    return false;
+  }
+
   function detectReferenceStyle(refText) {
+    if (hasAscendingNumberedRun(refText, 3)) return 'numbered';
     const numbered = (refText.match(/(?:^|\n)\s*(?:\[\d{1,3}\]|\d{1,3}[.\)])\s+/g) || []).length;
     const authorYear = (refText.match(/\n(?=[A-Z][\p{L}\-']+,\s)/gu) || []).length;
     return numbered >= 2 && numbered >= authorYear ? 'numbered' : 'author-year';
@@ -884,7 +903,9 @@
     // a short, mostly-uppercase line is almost always a masthead/running-head label,
     // e.g. "EAACI POSITION PAPER" — not real prose. The length allowance is generous
     // because letter-spacing ("E A A C I ...") can double a heading's raw character count.
-    if (t.length < 90 && /[A-Z]{3,}/.test(t) && /^[A-Z0-9 \-|.,]+$/.test(t)) return true;
+    // Exempt TRAILING_SECTION_WORDS (e.g. "APPENDIX") — findAppendixPage needs to see
+    // that line survive so it can find where to cut the reference list off.
+    if (t.length < 90 && !TRAILING_SECTION_WORDS.has(compact) && /[A-Z]{3,}/.test(t) && /^[A-Z0-9 \-|.,]+$/.test(t)) return true;
     // byline with affiliation-superscript markers: "Name[1] | Name[2] | Name[3] ..."
     // — looks just like a run of numbered citations, but it's author affiliations
     if ((t.match(/\[\d{1,3}\]/g) || []).length >= 3 && (t.match(/\|/g) || []).length >= 2) return true;
@@ -941,12 +962,24 @@
     return fixHyphenation(big);
   }
 
-  function buildRefText(refPages, headingPage) {
+  const TRAILING_SECTION_WORDS = new Set(['APPENDIX', 'APPENDICES', 'SUPPLEMENTARYMATERIAL',
+    'SUPPLEMENTARYDATA', 'SUPPORTINGINFORMATION', 'SUPPLEMENTARYINFORMATION']);
+
+  function buildRefText(refPages) {
     let text = refPages.map(pg => pageLinesClean(pg).join('\n')).join('\n');
     text = fixHyphenation(text);
     const lines = text.split('\n');
     if (lines.length && lineMatchesHeading(lines[0], REF_HEADING_WORDS, REF_HEADING_KO_RE)) lines.shift();
-    return lines.join('\n').trim();
+    // an appendix (e.g. a multi-center trial's investigator-by-country list) coming
+    // right after the reference list would otherwise get swallowed into the last
+    // reference's text — cut it off there. This works at line, not page, granularity
+    // because the appendix marker often shares a page with the final reference entries.
+    const cutIdx = lines.findIndex(l => {
+      const compact = stripToLetters(l.trim());
+      return compact.length >= 5 && compact.length <= 30 && TRAILING_SECTION_WORDS.has(compact);
+    });
+    const trimmed = cutIdx === -1 ? lines : lines.slice(0, cutIdx);
+    return trimmed.join('\n').trim();
   }
 
   function sentencesWithPages(bodyText) {
@@ -1500,7 +1533,7 @@
     const refPages = pages.filter(p => p.num >= effectiveHeadingPage);
 
     const bodyText = buildBodyText(bodyPages);
-    const refText = buildRefText(refPages, effectiveHeadingPage);
+    const refText = buildRefText(refPages);
     const style = detectReferenceStyle(refText);
     const refs = parseReferenceList(refText, style);
     let sentences = sentencesWithPages(bodyText);
