@@ -982,8 +982,28 @@
     return trimmed.join('\n').trim();
   }
 
+  // some journals set the citation superscript AFTER the sentence-ending period
+  // ("...even mortality.¹⁵⁶" → text becomes "...mortality. [5,6]"). Our sentence
+  // splitter treats "period + space + [" as a new-sentence start, so that trailing
+  // citation lands as a phantom lead-in on the NEXT sentence instead. A real
+  // sentence never opens with a bare citation marker, so any chunk that does is
+  // reattached to the end of the one before it.
+  function reattachLeadingCitations(chunks) {
+    const LEAD_RE = /^(PAGE:\d+)?\s*((?:\[\d+(?:\s*[-–—,]\s*\d+)*\]\s*)+)/;
+    for (let i = 1; i < chunks.length; i++) {
+      const m = chunks[i].match(LEAD_RE);
+      if (m && m[2]) {
+        const pageSentinel = m[1] || '';
+        const brackets = m[2].trim();
+        chunks[i - 1] = chunks[i - 1].replace(/\s+$/, '') + ' ' + brackets;
+        chunks[i] = pageSentinel + chunks[i].slice(m[0].length);
+      }
+    }
+    return chunks;
+  }
+
   function sentencesWithPages(bodyText) {
-    const raw = splitSentences(bodyText);
+    const raw = reattachLeadingCitations(splitSentences(bodyText));
     const out = [];
     let currentPage = null;
     raw.forEach(chunk => {
