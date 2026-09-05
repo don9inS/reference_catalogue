@@ -674,14 +674,35 @@
       results.push({ nums: expandNumberedToken(m[1]), raw: m[0], start: m.index, end: m.index + m[0].length });
     }
     // bare-parenthesis style used by many medical journals: (1), ( 3,4), (8-13), (22,23)
-    // a lone 4+ digit number is excluded (almost certainly a year or measurement, not a citation index)
     const parenRe = /\(\s*(\d{1,3}(?:\s*[-–—,]\s*\d{1,3})*)\s*\)/g;
+    const parenMatches = [];
     while ((m = parenRe.exec(sentence))) {
-      const token = m[1];
-      const isList = /[-–—,]/.test(token);
-      if (!isList && +token >= 1000) continue;
-      results.push({ nums: expandNumberedToken(token), raw: m[0], start: m.index, end: m.index + m[0].length });
+      parenMatches.push({ token: m[1], raw: m[0], start: m.index, end: m.index + m[0].length });
     }
+
+    // "...required at least 1 of the following: (1) X; (2) Y; or (3) Z" — an inline
+    // enumerated list, not citations. Flagged as 2+ bare single numbers that ascend
+    // consecutively starting at 1; real citations essentially never repeat like
+    // that within one sentence.
+    const bareSingles = parenMatches.filter(pm => /^\d{1,3}$/.test(pm.token));
+    let enumRunLength = 0;
+    if (bareSingles.length >= 2 && +bareSingles[0].token === 1) {
+      enumRunLength = 1;
+      for (let i = 1; i < bareSingles.length; i++) {
+        if (+bareSingles[i].token === +bareSingles[i - 1].token + 1) enumRunLength++;
+        else break;
+      }
+    }
+    const enumStarts = new Set(enumRunLength >= 2 ? bareSingles.slice(0, enumRunLength).map(pm => pm.start) : []);
+
+    parenMatches.forEach(pm => {
+      if (enumStarts.has(pm.start)) return; // part of an enumerated list, not a citation
+      // a lone 4+ digit bare number is excluded (almost certainly a year or measurement)
+      const isList = /[-–—,]/.test(pm.token);
+      if (!isList && +pm.token >= 1000) return;
+      results.push({ nums: expandNumberedToken(pm.token), raw: pm.raw, start: pm.start, end: pm.end });
+    });
+
     return results;
   }
 
@@ -841,25 +862,34 @@
   // preceding text's baseline is a superscript citation marker with no bracket
   // or parenthesis of its own (common in medical/EAACI-style journals) —
   // synthesize the brackets so the normal numbered-citation detector finds it
-  function isSuperscriptCitation(it, prevHeight, prevY) {
+  function isSuperscriptCitation(it, prevHeight, prevY, prevStr, gap) {
     if (!/^\d+(?:[,\-\u2013\u2014]\d+)*$/.test((it.str || '').trim())) return false;
     if (!it.height || !prevHeight || !(it.height <= prevHeight * 0.85)) return false;
     if (prevY == null || it.y == null || !(it.y > prevY + 1.2)) return false;
+    // math/unit exponents (x\u00b2, kg/m\u00b2, 10\u00b3 ...) are geometrically identical to a
+    // citation superscript \u2014 same reduced size, same raised baseline \u2014 so only the
+    // token they're glued to (zero gap) tells them apart from a real citation
+    if (gap != null && gap < 2) {
+      const trailingToken = (prevStr || '').match(/\S*$/)[0];
+      if (/\d$/.test(trailingToken)) return false; // "...10" + "\u00b3" \u2192 scientific notation
+      if (trailingToken.includes('/')) return false; // "kg/m" + "\u00b2" \u2192 unit denominator
+      if (trailingToken.length === 1 && /[A-Za-z]/.test(trailingToken)) return false; // "x" + "\u00b2" \u2192 math variable
+    }
     return true;
   }
 
   function joinItems(items) {
     let out = '';
-    let prevEndX = null, prevY = null;
+    let prevEndX = null, prevY = null, prevStr = '';
     // separate "was this the last genuine running-prose text" reference, used only
     // for the superscript check — a page number or letter-spaced heading must never
     // count as the baseline a nearby digit run gets compared against
     let proseHeight = null, proseY = null;
     items.forEach(it => {
-      const sup = isSuperscriptCitation(it, proseHeight, proseY);
+      const sameLine = prevY != null && it.y != null && Math.abs(it.y - prevY) < 6;
+      const gap = sameLine && it.x != null && prevEndX != null ? it.x - prevEndX : Infinity;
+      const sup = isSuperscriptCitation(it, proseHeight, proseY, prevStr, gap);
       if (out && !(prevEndX == null)) {
-        const sameLine = prevY != null && it.y != null && Math.abs(it.y - prevY) < 6;
-        const gap = sameLine && it.x != null ? it.x - prevEndX : Infinity;
         if (!sameLine || gap > (it.height || 10) * 0.18) out += ' ';
       } else if (out) {
         out += ' ';
@@ -867,6 +897,7 @@
       out += sup ? '[' + it.str.trim() + ']' : it.str;
       prevEndX = it.x != null ? it.x + (it.width || 0) : null;
       prevY = it.y != null ? it.y : null;
+      prevStr = it.str || '';
       const trimmed = (it.str || '').trim();
       // any letter counts, not just lowercase — "(DPT)" is genuine running prose too,
       // it just happens to be an all-caps abbreviation; only bare digits (page numbers)
@@ -1577,7 +1608,12 @@
     // title / author / affiliation / abstract come before Introduction and never
     // contain real citations — excluding them outright avoids having to tell a
     // citation superscript apart from an author's affiliation-number superscript
-    const bodyPages = pages.filter(p => p.num < effectiveHeadingPage && (!introPage || p.num >= introPage));
+    // include the References page itself in body scanning too: the heading is a
+    // page-level cut, but Discussion text routinely runs right up to it on the
+    // same physical page, and that tail end would otherwise lose its citations
+    // silently. Scanning the reference entries themselves as "body" is harmless —
+    // they carry no bracket citations, so buildSentenceRecords just drops them.
+    const bodyPages = pages.filter(p => p.num <= effectiveHeadingPage && (!introPage || p.num >= introPage));
     const refPages = pages.filter(p => p.num >= effectiveHeadingPage);
 
     const bodyText = buildBodyText(bodyPages);
